@@ -184,7 +184,7 @@ class GoogleTranslator(object):
 
 translator = GoogleTranslator()
 
-def send_email(attachment_filename, body, from_email, from_email_password, to_emails, subject):
+def send_email_with_attachment(attachment_filename, body, from_email, from_email_password, to_emails, subject):
     msg = MIMEMultipart()
 
     filename = attachment_filename
@@ -204,51 +204,78 @@ def send_email(attachment_filename, body, from_email, from_email_password, to_em
     server.sendmail(from_email, [to_emails], msg.as_string())
     server.quit()
 
+def send_email(body, from_email, from_email_password, to_emails, subject):
+    msg = MIMEMultipart()
+
+    msg['Subject'] = subject
+    msg['From'] = from_email
+    msg['To'] = to_emails
+    msg.attach(MIMEText(body))
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(from_email, from_email_password)
+    server.sendmail(from_email, [to_emails], msg.as_string())
+    server.quit()
+
 #############################################################################################
 #scraper 
 
+error_urls = []
 list_of_rows = []
 
-for x in xrange(0,14085): #14085
+for x in xrange(0, 14085): #14085
 
-    url = 'https://www.10bis.co.il/Restaurants/Menu/Delivery/' + str(x)
-    response = requests.get(url)
-    html = response.content
-    span_array = []
+    if x % 500 == 0:
+        print x
 
-    soup = BeautifulSoup(html)
+    try:
+        url = 'https://www.10bis.co.il/Restaurants/Menu/Delivery/' + str(x)
+        response = requests.get(url)
+        html = response.content
+        span_array = []
 
-    if soup.find('title').text == "500 - Internal server error.":
-        continue
+        soup = BeautifulSoup(html)
+
+        if soup.find('title').text == "500 - Internal server error.":
+#            print "Unexpected error: page doesn't exist URL: " + url
+            error_urls.append(url)
+            continue
 
 
-    list_of_cells = []
+        list_of_cells = []
 
-    div_list = []
+        div_list = []
 
-    restaurant_details_div = soup.find('div', attrs={'class': 'ResDetailsDiv'})
+        restaurant_details_div = soup.find('div', attrs={'class': 'ResDetailsDiv'})
 
-    for div in restaurant_details_div:
-        div_list.append(div)
+        for div in restaurant_details_div:
+            div_list.append(div)
 
-    restaurant_city = soup.find('meta', attrs={'itemprop': 'addressLocality'})['content']
-    restaurant_address = soup.find('meta', attrs={'itemprop': 'streetAddress'})['content']
-    restaurant_name = soup.find('span', attrs={'class': 'ResNameHeader'}).text.replace('&nbsp;', '').replace('&quot;', '"').replace('&#39;', "'").replace('&amp;', "'")
-    restaurant_url = soup.find('meta', attrs={'itemprop': 'menu'})['content']
-    restaurant_category = div_list[3].text
+        restaurant_city = soup.find('meta', attrs={'itemprop': 'addressLocality'})['content']
+        restaurant_address = soup.find('meta', attrs={'itemprop': 'streetAddress'})['content']
+        restaurant_name = soup.find('span', attrs={'class': 'ResNameHeader'}).text.replace('&nbsp;', '').replace('&quot;', '"').replace('&#39;', "'").replace('&amp;', "'")
+        restaurant_url = soup.find('meta', attrs={'itemprop': 'menu'})['content']
+        restaurant_category = div_list[3].text
 
-    for div in restaurant_details_div:
-        div_list.append(div)
+        for div in restaurant_details_div:
+            div_list.append(div)
 
-#    print restaurant_name
+#        print restaurant_name
 
-    list_of_cells.append(restaurant_city.encode('UTF-8'))
-    list_of_cells.append(restaurant_address.encode('UTF-8'))
-    list_of_cells.append(restaurant_name.encode('UTF-8'))
-    list_of_cells.append(restaurant_url.encode('UTF-8'))
-    list_of_cells.append(restaurant_category.encode('UTF-8'))
+        list_of_cells.append(restaurant_city.encode('UTF-8'))
+        list_of_cells.append(restaurant_address.encode('UTF-8'))
+        list_of_cells.append(restaurant_name.encode('UTF-8'))
+        list_of_cells.append(restaurant_url.encode('UTF-8'))
+        list_of_cells.append(restaurant_category.encode('UTF-8'))
 
-    list_of_rows.append(list_of_cells)
+        list_of_rows.append(list_of_cells)
+    except TypeError:
+#        print "TypeError at " + url
+        error_urls.append(url)
+    except:
+#        print "Unexpected error at" + url
+        error_urls.append(url)
 
 full_file_path = "./restaurants.csv"
 outfile = open(full_file_path, "wb")
@@ -260,7 +287,9 @@ header_writer.writeheader()
 writer = csv.writer(outfile)
 writer.writerows(list_of_rows)
 
-time.sleep(5)
+error_urls_string = ""
+for url in error_urls:
+    error_urls_string += url + ", "
 
 #attachment_filename, body, from_email, from_email_password, to_emails, subject
-send_email(full_file_path, "Here is a little list of restaurant info in israel", 'mark@pushstartups.com', 'zdhconsulting2', 'mcheirif@gmail.com', 'Restaurant list CSV')
+send_email("Error urls: \n" + error_urls_string, 'mark@pushstartups.com', 'zdhconsulting2', 'mcheirif@gmail.com', 'Error urls')
