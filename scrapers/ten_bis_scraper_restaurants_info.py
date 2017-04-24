@@ -233,10 +233,18 @@ writer = csv.writer(outfile)
 error_urls = []
 list_of_rows = []
 
-for x in xrange(0, 14086): #14085
+for x in xrange(4000, 14086): #14085
 
     if x % 500 == 0:
-        send_email(str(x), 'mark@pushstartups.com', 'zdhconsulting2', 'mcheirif@gmail.com', 'REACHED URL ' + str(x))
+	send_email(str(x), 'mark@pushstartups.com', 'zdhconsulting2', 'mcheirif@gmail.com', 'REACHED URL ' + str(x))
+
+	error_urls_string = ""
+	for url in error_urls:
+    		error_urls_string += url + ", "
+
+	send_email("Error urls: \n" + error_urls_string, 'mark@pushstartups.com', 'zdhconsulting2', 'mcheirif@gmail.com', 'Error urls')
+	error_urls
+	print x
 
     try:
         url = 'https://www.10bis.co.il/Restaurants/Menu/Delivery/' + str(x)
