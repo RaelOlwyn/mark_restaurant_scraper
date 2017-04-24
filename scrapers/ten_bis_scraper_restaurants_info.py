@@ -221,13 +221,22 @@ def send_email(body, from_email, from_email_password, to_emails, subject):
 #############################################################################################
 #scraper 
 
+full_file_path = "./restaurants.csv"
+outfile = open(full_file_path, "a")
+
+fieldnames = ['City', 'Address', 'Restaurant Name', 'Link', 'Category']
+header_writer = csv.DictWriter(outfile, fieldnames=fieldnames)
+header_writer.writeheader()
+
+writer = csv.writer(outfile)
+
 error_urls = []
 list_of_rows = []
 
-for x in xrange(0, 14085): #14085
+for x in xrange(0, 14086): #14085
 
     if x % 500 == 0:
-        print x
+        send_email(str(x), 'mark@pushstartups.com', 'zdhconsulting2', 'mcheirif@gmail.com', 'REACHED URL ' + str(x))
 
     try:
         url = 'https://www.10bis.co.il/Restaurants/Menu/Delivery/' + str(x)
@@ -270,6 +279,11 @@ for x in xrange(0, 14085): #14085
         list_of_cells.append(restaurant_category.encode('UTF-8'))
 
         list_of_rows.append(list_of_cells)
+
+	if x % 100 == 0 and x != 0:
+            writer.writerows(list_of_rows)
+            list_of_rows = []
+
     except TypeError:
 #        print "TypeError at " + url
         error_urls.append(url)
@@ -277,15 +291,8 @@ for x in xrange(0, 14085): #14085
 #        print "Unexpected error at" + url
         error_urls.append(url)
 
-full_file_path = "./restaurants.csv"
-outfile = open(full_file_path, "wb")
-
-fieldnames = ['City', 'Address', 'Restaurant Name', 'Link', 'Category']
-header_writer = csv.DictWriter(outfile, fieldnames=fieldnames)
-header_writer.writeheader()
-
-writer = csv.writer(outfile)
 writer.writerows(list_of_rows)
+outfile.close()
 
 error_urls_string = ""
 for url in error_urls:
@@ -293,3 +300,4 @@ for url in error_urls:
 
 #attachment_filename, body, from_email, from_email_password, to_emails, subject
 send_email("Error urls: \n" + error_urls_string, 'mark@pushstartups.com', 'zdhconsulting2', 'mcheirif@gmail.com', 'Error urls')
+send_email_with_attachment(full_file_path, "Done", 'mark@pushstartups.com', 'zdhconsulting2', 'mcheirif@gmail.com', full_file_path)
