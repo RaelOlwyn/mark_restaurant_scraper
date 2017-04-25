@@ -233,7 +233,7 @@ writer = csv.writer(outfile)
 error_urls = []
 list_of_rows = []
 
-for x in xrange(4000, 14086): #14085
+for x in xrange(0, 14086): #14085
 
     if x % 500 == 0:
 	send_email(str(x), 'mark@pushstartups.com', 'zdhconsulting2', 'mcheirif@gmail.com', 'REACHED URL ' + str(x))
