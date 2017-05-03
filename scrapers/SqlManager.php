@@ -52,15 +52,16 @@ Class SqlManager{
 		return $last_id;
 	}
 
-	public function getLastSortId($table, $last_id) {
-		$sql = "SELECT *  FROM " . $table .  " WHERE id=" . $last_id;
+	public function getLastSortId($table) {
+		$sql = "SELECT sort FROM " . $table;
 		$result = $this->conn->query($sql);
 		$last_sort_id = -1;
 
 		if ($result->num_rows > 0) {
 		    // output data of each row
 		    while($row = $result->fetch_assoc()) {
-			$last_sort_id = $row["sort"];
+			$last_sort_id = ($row["sort"] > $last_sort_id ? $row["sort"] : $last_sort_id);
+			//$last_sort_id = $row["sort"];
 			}
 
 		} else {
