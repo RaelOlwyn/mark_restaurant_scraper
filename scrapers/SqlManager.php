@@ -73,7 +73,7 @@ Class SqlManager{
 	public function getIdByColumnHeaderAndValue($table, $column_header, $column_value, $symbol=""){
         	$sql = "SELECT id FROM " . $table .  " WHERE " . $column_header . "=" . $symbol . $column_value . $symbol;
         	//$sql = "SELECT id FROM cities WHERE name_en='Hod Hasharon'";
-        	$result = $this->$conn->query($sql);
+        	$result = $this->conn->query($sql);
         	$id = -1;
 
         	if ($result->num_rows > 0) {
@@ -101,31 +101,31 @@ Class SqlManager{
 	        return $csvString;
 	}
 
-	public function insertInTableWithoutColumnHeaders($conn, $table, $last_id, $values_array) {
+	public function insertInTableWithoutColumnHeaders($table, $last_id, $values_array) {
 	        $values_string = $this->makeArrayIntoCsvString($values_array, "'");
 
-	        $sql = "INSERT INTO " . $table . "  VALUES (" . ++$last_id  . ", " . $values_string . ")";
+	        $sql = "INSERT INTO " . $table . " VALUES (" . ++$last_id  . ", " . $values_string . ")";
 
-	        if ($this->$conn->query($sql) === TRUE) {
+	        if ($this->conn->query($sql) === TRUE) {
 	                echo "New record created successfully at ";
-	                echo $this->$conn->insert_id . "\n";
+	                echo $this->conn->insert_id . "\n";
 	        } else {
-	            echo "Error: " . $sql . "<br>" . $conn->error;
+	            echo "Error: " . $sql . "<br>" . $this->conn->error;
 	        }
 	}
 
 
-	public function insertInTable($conn, $table, $column_names_array, $last_id, $last_sort_id, $values_array) {
+	public function insertInTable($table, $column_names_array, $last_id, $last_sort_id, $values_array) {
 		$colums_string = $this->makeArrayIntoCsvString($column_names_array);
 		$values_string = $this->makeArrayIntoCsvString($values_array, "'");
 
 		$sql = "INSERT INTO " . $table . " (" . $colums_string . ") VALUES (" . ++$last_id  . ", " . $values_string . ")";
 
-		if ($this->$conn->query($sql) === TRUE) {
+		if ($this->conn->query($sql) === TRUE) {
 		        echo "New record created successfully at ";
-		        echo $conn->insert_id . "\n";
+		        echo $this->conn->insert_id . "\n";
 		} else {
-		    echo "Error: " . $sql . "<br>" . $conn->error;
+		    echo "Error: " . $sql . "<br>" . $this->conn->error;
 		}
 	}
 
