@@ -2,11 +2,6 @@
 
 Class SqlManager{
 
-	$servername = "localhost";
-	$username = "root";
-	$password = "orderapp";
-	$dbname = "orderapp";
-
 	public function SqlManager($servername, $username, $password, $dbname, $charset){
 		$this->conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -15,32 +10,32 @@ Class SqlManager{
 	}
 
 	function check_connection(){
-		if ($conn->connect_error) {
-		    die("Connection failed: " . $conn->connect_error);
+		if ($this->conn->connect_error) {
+		    die("Connection failed: " . $this->conn->connect_error . "\n");
 		}
 		else{
-			printf("Good connection");
+			printf("Good connection" . "\n");
 		}
 	}
 
 	public function get_charset($charset){
-		return $this->$conn->character_set_name();
+		return $this->conn->character_set_name();
 	}
 
 	public function set_charset($charset){
 		//set character set to utf-8
-		if (!$this->$conn->set_charset("utf8")) {
-		    printf("Error loading character set utf8: %s\n", $this->$conn->error);
+		if (!$this->conn->set_charset($charset)) {
+		    printf("Error loading character set utf8: %s\n", $this->conn->error);
 		    exit();
 		} else {
-		    printf("Current character set: %s\n", $this->$conn->character_set_name());
+		    printf("Current character set: %s\n", $this->conn->character_set_name());
 		}
 	}
 
 	public function getLastId($table) {
 
 		$sql = "SELECT *  FROM " . $table;
-		$result = $this->$conn->query($sql);
+		$result = $this->conn->query($sql);
 		$last_id = -1;
 
 		if ($result->num_rows > 0) {
@@ -59,7 +54,7 @@ Class SqlManager{
 
 	public function getLastSortId($table, $last_id) {
 		$sql = "SELECT *  FROM " . $table .  " WHERE id=" . $last_id;
-		$result = $this->$conn->query($sql);
+		$result = $this->conn->query($sql);
 		$last_sort_id = -1;
 
 		if ($result->num_rows > 0) {
@@ -75,38 +70,26 @@ Class SqlManager{
 		return $last_sort_id;
 	}
 
-	function makeArrayIntoCsvString($array, $symbol=""){
-		$csvString = "";
-
-		foreach ($array as $value)
-			$csvString .= $symbol . $value . $symbol . ", ";
-
-		$indexOfLastComma = strrpos( $csvString , ", ");
-		$csvString = substr($csvString, 0, $indexOfLastComma);
-
-		return $csvString;
-	}
-
 	public function getIdByColumnHeaderAndValue($table, $column_header, $column_value, $symbol=""){
-        $sql = "SELECT id FROM " . $table .  " WHERE " . $column_header . "=" . $symbol . $column_value . $symbol;
-        //$sql = "SELECT id FROM cities WHERE name_en='Hod Hasharon'";
-        $result = $this->$conn->query($sql);
-        $id = -1;
+        	$sql = "SELECT id FROM " . $table .  " WHERE " . $column_header . "=" . $symbol . $column_value . $symbol;
+        	//$sql = "SELECT id FROM cities WHERE name_en='Hod Hasharon'";
+        	$result = $this->$conn->query($sql);
+        	$id = -1;
 
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while($row = $result->fetch_assoc()) {
-                $id = $row["id"];
-            }
+        	if ($result->num_rows > 0) {
+            	// output data of each row
+            	while($row = $result->fetch_assoc()) {
+                	$id = $row["id"];
+            	}
 
-    	 } else {
-            echo "0 results";
-        }
+    	 	} else {
+            		echo "0 results";
+        	}
 
-		return $id;
+			return $id;
 	}
 
-	public function makeArrayIntoCsvString($array, $symbol=""){
+	function makeArrayIntoCsvString($array, $symbol=""){
 	        $csvString = "";
 
 	        foreach ($array as $value)
