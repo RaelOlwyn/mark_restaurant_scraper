@@ -16,6 +16,7 @@ require("SqlManager.php");
 	$categories = $csv_reader->read_csv_as_array($dir . "categories.csv");
 	$items = $csv_reader->read_csv_as_array($dir . "items.csv");
 	$extras = $csv_reader->read_csv_as_array($dir . "extras.csv");
+	$subitems = $csv_reader->read_csv_as_array($dir . "subitems.csv");
 
 	$city_name_he = $restaurants[1][4];
 	$restaurant_name_he = $restaurants[1][1];
@@ -87,14 +88,14 @@ for ($i=1; $i < count($categories); $i++) {
 			continue;
 		}
 
-        	$table = "items";
-        	$last_item_id = $sql->getLastId($table);
+        	$last_item_id = $sql->getLastId("items");
         	$item_id = $last_item_id + 1;
+		$item_name_he = $items[$i][2];
 
-        	$last_item_sort_id = $sql->getLastSortId($table);
+        	$last_item_sort_id = $sql->getLastSortId("items");
         	$current_item_sort_id = $last_item_sort_id + 1;
 
-        	$sql->insertInTableWithoutColumnHeaders($table, $last_item_id, [
+        	$sql->insertInTableWithoutColumnHeaders("items", $last_item_id, [
                 	$category_id,
                 	str_replace("'","\'", $items[$j][1]),
                 	str_replace("'","\'", $items[$j][2]),
@@ -104,7 +105,54 @@ for ($i=1; $i < count($categories); $i++) {
                 	$current_item_sort_id
        		]);
 
-}
+		$extra_id = -1;
+		for ($y=1; $y < count($extras); $y++) {
+
+	                if($extras[$y][0] !== $item_name_he){
+        	                continue;
+	                }
+
+        	        $last_extra_id = $sql->getLastId("extras");
+        	        $extra_id = $last_extra_id + 1;
+			$extra_name_he = $extras[$y][4];
+
+        	        $last_extra_sort_id = $sql->getLastSortId("extras");
+        	        $current_extra_sort_id = $last_extra_sort_id + 1;
+
+        	        $sql->insertInTableWithoutColumnHeaders("extras", $last_extra_id, [
+        	                $item_id,
+        	                str_replace("'","\'", $extras[$y][1]),
+        	                str_replace("'","\'", $extras[$y][2]),
+                	        $extras[$y][3],
+                        	str_replace("'","\'", $extras[$y][4]),
+                        	$current_extra_sort_id
+                	]);
+
+			$subitem_id = -1;
+	                for ($z = 1; $z < count($subitems); $z++) {
+
+	                        if($subitems[$z][0] !== $extra_name_he){
+	                                continue;
+	                        }
+
+	                        $last_subitem_id = $sql->getLastId("subitems");
+	                        $subitem_id = $last_subitem_id + 1;
+
+	                        $last_subitem_sort_id = $sql->getLastSortId("subitems");
+	                        $current_subitem_sort_id = $last_subitem_sort_id + 1;
+
+	                        $sql->insertInTableWithoutColumnHeaders("subitems", $last_subitem_id, [
+	                                $extra_id,
+	                                str_replace("'","\'", $subitems[$z][1]),
+	                                str_replace("'","\'", $subitems[$z][2]),
+	                                $subitems[$y][3],
+	                                $current_subitem_sort_id
+	                        ]);
+
+			}
+        	}
+
+	}
 
 }
 
