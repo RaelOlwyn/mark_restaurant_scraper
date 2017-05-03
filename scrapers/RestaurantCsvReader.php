@@ -53,7 +53,7 @@ $sql->insertInTableWithoutColumnHeaders("restaurants", $last_id, [
 
 $last_id = $sql->getLastId("menus");
 $menu_id = $last_id + 1;
-$last_sort_id = $sql->getLastSortId("menus", $last_id);
+$last_sort_id = $sql->getLastSortId("menus");
 
 $sql->insertInTableWithoutColumnHeaders("menus", $last_id, [
                 $resturant_id,
@@ -67,8 +67,9 @@ for ($i=1; $i < count($categories); $i++) {
 
 	$last_id = $sql->getLastId("categories");
         $category_id = $last_id + 1;
+	$category_name_he = $categories[$i][1];
 
-	$last_sort_id = $sql->getLastSortId("categories", $last_id);
+	$last_sort_id = $sql->getLastSortId("categories");
 	$current_sort_id = $last_sort_id + 1;
 
 	$sql->insertInTableWithoutColumnHeaders("categories", $last_id, [
@@ -76,8 +77,34 @@ for ($i=1; $i < count($categories); $i++) {
                	$categories[$i][0],
 		$categories[$i][1],
 		$categories[$i][2],
-               	$last_sort_id+1
+               	$current_sort_id
         ]);
+
+	$item_id = -1;
+	for ($j=1; $j < count($items); $j++) {
+
+		if($items[$j][0] !== $category_name_he){
+			continue;
+		}
+
+        	$table = "items";
+        	$last_item_id = $sql->getLastId($table);
+        	$item_id = $last_item_id + 1;
+
+        	$last_item_sort_id = $sql->getLastSortId($table);
+        	$current_item_sort_id = $last_item_sort_id + 1;
+
+        	$sql->insertInTableWithoutColumnHeaders($table, $last_item_id, [
+                	$category_id,
+                	str_replace("'","\'", $items[$j][1]),
+                	str_replace("'","\'", $items[$j][2]),
+                	str_replace("'","\'", $items[$j][3]),
+                	str_replace("'","\'", $items[$j][4]),
+                	str_replace("'","\'", $items[$j][5]),
+                	$current_item_sort_id
+       		]);
+
+}
 
 }
 
