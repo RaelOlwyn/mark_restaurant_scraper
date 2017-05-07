@@ -90,7 +90,7 @@ for ($i=1; $i < count($categories); $i++) {
 
         	$last_item_id = $sql->getLastId("items");
         	$item_id = $last_item_id + 1;
-		$item_sheet_id = $items[$i][0];
+		$item_sheet_id = $items[$j][0];
 
         	$last_item_sort_id = $sql->getLastSortId("items");
         	$current_item_sort_id = $last_item_sort_id + 1;
@@ -108,8 +108,13 @@ for ($i=1; $i < count($categories); $i++) {
 		$extra_id = -1;
 		for ($y=1; $y < count($extras); $y++) {
 
+//			$last_extra_id = $sql->getLastId("extras");
+//                        $extra_id = $last_extra_id + 1;
+//			$extras[$y][1] . " !== " . $item_sheet_id;
+
 	                if($extras[$y][1] !== $item_sheet_id){
-        	                continue;
+        	                echo "\nITEM FK:" . $extras[$y][1] . " !== PK:" . $item_sheet_id;
+				continue;
 	                }
 
         	        $last_extra_id = $sql->getLastId("extras");
@@ -149,17 +154,16 @@ for ($i=1; $i < count($categories); $i++) {
 	                                $current_subitem_sort_id
 	                        ]);
 
-				unset($subitems[$z]);
-                        	$subitems = array_values($subitems);
+//				unset($subitems[$z]);
+//                        	$subitems = array_values($subitems);
 			}
-			unset($extras[$y]);
-                      	$extras = array_values($extras);
+//			unset($extras[$y]);
+//                      	$extras = array_values($extras);
         	}
-		unset($items[$j]);
-                $items = array_values($items);
+//		unset($items[$j]);
+//                $items = array_values($items);
 	}
-	unset($categories[$i]);
-        $categories = array_values($categories);
+//	array_splice($categories, $i, $i); //test
 }
 
 ?>

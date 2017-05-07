@@ -11,10 +11,10 @@ Class SqlManager{
 
 	function check_connection(){
 		if ($this->conn->connect_error) {
-		    die("Connection failed: " . $this->conn->connect_error . "\n");
+		    die("\nConnection failed: " . $this->conn->connect_error . "\n");
 		}
 		else{
-			printf("Good connection" . "\n");
+			printf("\nGood connection" . "\n");
 		}
 	}
 
@@ -25,10 +25,10 @@ Class SqlManager{
 	public function set_charset($charset){
 		//set character set to utf-8
 		if (!$this->conn->set_charset($charset)) {
-		    printf("Error loading character set utf8: %s\n", $this->conn->error);
+		    printf("\nError loading character set utf8: %s\n", $this->conn->error);
 		    exit();
 		} else {
-		    printf("Current character set: %s\n", $this->conn->character_set_name());
+		    printf("\nCurrent character set: %s\n", $this->conn->character_set_name());
 		}
 	}
 
@@ -44,10 +44,10 @@ Class SqlManager{
 		        $last_id = $row["id"] >= $last_id ? $row["id"] : $last_id;
 			$row["id"].  "\n";
 		    }
-		    echo " Last inserted ID is: " . $last_id . "\n";
+//		    echo "\nLast inserted ID is: " . $last_id . "\n";
 
 		} else {
-		    echo "0 results";
+		    echo "\n0 results";
 		}
 		return $last_id;
 	}
@@ -65,7 +65,7 @@ Class SqlManager{
 			}
 
 		} else {
-		    echo "0 results";
+		    echo "\n0 results";
 		}
 
 		return $last_sort_id;
@@ -84,7 +84,7 @@ Class SqlManager{
             	}
 
     	 	} else {
-            		echo "0 results";
+            		echo "\n0 results";
         	}
 
 			return $id;
@@ -108,10 +108,10 @@ Class SqlManager{
 	        $sql = "INSERT INTO " . $table . " VALUES (" . ++$last_id  . ", " . $values_string . ")";
 
 	        if ($this->conn->query($sql) === TRUE) {
-	                echo "New record created successfully at ";
-	                echo $this->conn->insert_id . "\n";
+//	                echo "\nNew record created successfully at ";
+//	                echo $this->conn->insert_id . "\n";
 	        } else {
-	            echo "Error: " . $sql . "<br>" . $this->conn->error;
+	            echo "\nError: " . $sql . "<br>" . $this->conn->error;
 	        }
 	}
 
@@ -123,10 +123,10 @@ Class SqlManager{
 		$sql = "INSERT INTO " . $table . " (" . $colums_string . ") VALUES (" . ++$last_id  . ", " . $values_string . ")";
 
 		if ($this->conn->query($sql) === TRUE) {
-		        echo "New record created successfully at ";
-		        echo $this->conn->insert_id . "\n";
+//		        echo "\nNew record created successfully at ";
+//		        echo $this->conn->insert_id . "\n";
 		} else {
-		    echo "Error: " . $sql . "<br>" . $this->conn->error;
+		    echo "\nError: " . $sql . "<br>" . $this->conn->error;
 		}
 	}
 
