@@ -5,6 +5,7 @@ Class SqlManager{
 	public function SqlManager($servername, $username, $password, $dbname, $charset){
 		$this->conn = new mysqli($servername, $username, $password, $dbname);
 
+		$this->dbname = $dbname;
 		$this->check_connection();
 		$this->set_charset($charset);
 	}
@@ -34,46 +35,46 @@ Class SqlManager{
 
 	public function getLastId($table) {
 
-		$sql = "SELECT *  FROM " . $table;
-		$result = $this->conn->query($sql);
-		$last_id = -1;
+                $sql = "SELECT id FROM " . $table;
+                $result = $this->conn->query($sql);
+                $last_id = -1;
 
-		if ($result->num_rows > 0) {
-		    // output data of each row
-		    while($row = $result->fetch_assoc()) {
-		        $last_id = $row["id"] >= $last_id ? $row["id"] : $last_id;
-			$row["id"].  "\n";
-		    }
-//		    echo "\nLast inserted ID is: " . $last_id . "\n";
+                if ($result->num_rows > 0) {
+                    // output data of each row
+                    while($row = $result->fetch_assoc()) {
+			if($row["id"] < 99999){
+                        	$last_id = $row["id"] >= $last_id ? $row["id"] : $last_id;
+                        }
+                    }
+//                  echo "\nLast inserted ID is: " . $last_id . "\n";
 
-		} else {
-		    echo "\n0 results";
-		}
-		return $last_id;
-	}
+                } else {
+                    echo "\n0 results";
+                }
+                return $last_id;
+        }
 
 	public function getLastSortId($table) {
-		$sql = "SELECT sort FROM " . $table;
-		$result = $this->conn->query($sql);
-		$last_sort_id = -1;
+                $sql = "SELECT sort FROM " . $table;
+                $result = $this->conn->query($sql);
+                $last_sort_id = -1;
 
-		if ($result->num_rows > 0) {
-		    // output data of each row
-		    while($row = $result->fetch_assoc()) {
-			$last_sort_id = ($row["sort"] > $last_sort_id ? $row["sort"] : $last_sort_id);
-			//$last_sort_id = $row["sort"];
-			}
+                if ($result->num_rows > 0) {
+                    // output data of each row
+                    while($row = $result->fetch_assoc()) {
+                        $last_sort_id = ($row["sort"] > $last_sort_id ? $row["sort"] : $last_sort_id);
+                        }
 
-		} else {
-		    echo "\n0 results";
-		}
+                } else {
+                    echo "\n0 results";
+                }
 
-		return $last_sort_id;
-	}
+                return $last_sort_id;
+        }
 
 	public function getIdByColumnHeaderAndValue($table, $column_header, $column_value, $symbol=""){
         	$sql = "SELECT id FROM " . $table .  " WHERE " . $column_header . "=" . $symbol . $column_value . $symbol;
-        	//$sql = "SELECT id FROM cities WHERE name_en='Hod Hasharon'";
+
         	$result = $this->conn->query($sql);
         	$id = -1;
 
@@ -89,6 +90,26 @@ Class SqlManager{
 
 			return $id;
 	}
+
+	function getColumnNames($table){
+		$sql = "SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='" . $this->dbname . "' AND `TABLE_NAME`='" . $table . "' ";
+
+		$result = $this->conn->query($sql);
+                $columnNames = [];
+
+                if ($result->num_rows > 0) {
+                // output data of each row
+                while($row = $result->fetch_assoc()) {
+                        array_push($columnNames, $row["COLUMN_NAME"]);
+                }
+
+                } else {
+                        echo "\n0 results";
+                }
+
+                return $columnNames;
+	}
+
 
 	function makeArrayIntoCsvString($array, $symbol=""){
 	        $csvString = "";
@@ -111,12 +132,12 @@ Class SqlManager{
 //	                echo "\nNew record created successfully at ";
 //	                echo $this->conn->insert_id . "\n";
 	        } else {
-	            echo "\nError: " . $sql . "<br>" . $this->conn->error;
+	            echo "\nError: " . $sql . "\n" . $this->conn->error;
 	        }
 	}
 
 
-	public function insertInTable($table, $column_names_array, $last_id, $last_sort_id, $values_array) {
+	public function insertInTable($table, $column_names_array, $last_id, $values_array) {
 		$colums_string = $this->makeArrayIntoCsvString($column_names_array);
 		$values_string = $this->makeArrayIntoCsvString($values_array, "'");
 
@@ -126,13 +147,21 @@ Class SqlManager{
 //		        echo "\nNew record created successfully at ";
 //		        echo $this->conn->insert_id . "\n";
 		} else {
-		    echo "\nError: " . $sql . "<br>" . $this->conn->error;
+		    echo "\nError: " . $sql . "\n" . $this->conn->error;
 		}
 	}
 
 	public function close_connection(){
 		$this->$conn->close();
 	}
+
+}
+
+$sql = new SqlManager("localhost", "root", "orderapp", "orderapp", "utf8");
+$column_names = $sql->getColumnNames("categories");
+
+for ($i=0; $i < count($column_names); $i++) {
+	printf("Column name: %s\n", $column_names[$i]);
 
 }
 
