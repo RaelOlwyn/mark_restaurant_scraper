@@ -174,15 +174,22 @@ for ($i=1; $i < count($categories); $i++) {
         	        $last_extra_sort_id = $sql->getLastSortId("extras");
         	        $current_extra_sort_id = $last_extra_sort_id + 1;
 
-			$extras_column_names = [];
+			$extras_column_names = ["id", "item_id", "name_en", "type", "price_replace", "name_he", "limit", "sort"];
 
-        	        $sql->insertInTableWithoutColumnHeaders("extras", $last_extra_id, [
+			$extras_name_en = str_replace("'","\'", $extras[$y][2]);
+			$extras_type = str_replace("'","\'", $extras[$y][3]);
+			$extras_price_replace = intval($extras[$y][4]);
+			$extras_name_he = str_replace("'","\'", $extras[$y][5]);
+			$extras_limit = intval($extras[$y][6]);
+
+			$sql->insertInTableWithoutColumnHeaders("extras", $last_extra_id, [
+        	        /* $sql->insertInTable("extras", $extras_column_names, $last_extra_id, [ */
         	                $item_id,
-        	                str_replace("'","\'", $extras[$y][2]),
-        	                str_replace("'","\'", $extras[$y][3]),
-                	        $extras[$y][4],
-                        	str_replace("'","\'", $extras[$y][5]),
-                        	0, //limit
+        	                $extras_name_en,
+        	                $extras_type,
+                	        $extras_price_replace,
+                        	$extras_name_he,
+                        	$extras_limit,
 				$current_extra_sort_id
                 	]);
 
@@ -199,11 +206,17 @@ for ($i=1; $i < count($categories); $i++) {
 	                        $last_subitem_sort_id = $sql->getLastSortId("subitems");
 	                        $current_subitem_sort_id = $last_subitem_sort_id + 1;
 
-	                        $sql->insertInTableWithoutColumnHeaders("subitems", $last_subitem_id, [
+				$subitems_column_names = ["id", "extra_id", "name_en", "name_he", "price", "sort"];
+
+				$subitems_name_en = str_replace("'","\'", $subitems[$z][1]);
+				$subitems_name_he = str_replace("'","\'", $subitems[$z][2]);
+				$subitems_price = intval($subitems[$y][3]);
+
+	                        $sql->insertInTable("subitems", $subitems_column_names, $last_subitem_id, [
 	                                $extra_id,
-	                                str_replace("'","\'", $subitems[$z][1]),
-	                                str_replace("'","\'", $subitems[$z][2]),
-	                               	intval($subitems[$y][3]),
+	                                $subitems_name_en,
+	                                $subitems_name_he,
+	                               	$subitems_price,
 	                                $current_subitem_sort_id
 	                        ]);
 
