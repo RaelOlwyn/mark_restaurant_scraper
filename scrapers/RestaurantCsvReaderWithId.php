@@ -6,7 +6,7 @@ require("SqlManager.php");
 	//	$this->dir = $dir;
 	//}
 
-	$dir = "/home/ec2-user/scrapers/Restaurants/csv_ready_for_db/אלגריה/";
+	$dir = "/home/ec2-user/scrapers/Restaurants/csv_ready_for_db/גיאנט_פיצה/";
 
 	$sql = new SqlManager("localhost", "root", "orderapp", "orderapp", "utf8");
 
